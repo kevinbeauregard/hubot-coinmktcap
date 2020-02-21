@@ -1,4 +1,5 @@
 module.exports = function(robot) {
+  var apiKey = process.env.COINMKTCAP_API_KEY;
   var cents, formatCurrency, i, num, formatOrdinal;
 
   formatCurrency = function(num) {

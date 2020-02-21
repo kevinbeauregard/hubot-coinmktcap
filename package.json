@@ -1,6 +1,6 @@
 {
-  "name": "hubot-formatted-crypto",
-  "version": "1.0.6",
+  "name": "hubot-coinmktcap",
+  "version": "1.0.0",
   "description": "Displays user-requested crypto prices in Slack using clean, formatted messages.",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jonfairbanks/hubot-formatted-crypto.git"
+    "url": "git+https://github.com/kevinbeauregard/hubot-coinmktcap.git"
   },
   "keywords": [
     "crypto",
@@ -20,10 +20,10 @@
     "bitcoin",
     "litecoin"
   ],
-  "author": "Jon Fairbanks",
-  "license": "ISC",
+  "author": "Kevin Beauregard w credit to Jon Fairbanks",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jonfairbanks/hubot-formatted-crypto/issues"
+    "url": "https://github.com/kevinbeauregard/hubot-coinmktcap/issues"
   },
-  "homepage": "https://github.com/jonfairbanks/hubot-formatted-crypto#readme"
+  "homepage": "https://github.com/kevinbeauregard/hubot-coinmktcap#readme"
 }
