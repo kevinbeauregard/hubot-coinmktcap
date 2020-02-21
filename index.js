@@ -39,20 +39,18 @@ module.exports = function(robot) {
         var data = JSON.parse(body).data;
 
         coin = {};
-        for (i = 0, len = data.length; i < len; i++) {
-          row = data[i];
-          coin[row.symbol] = {
-            name: row.name,
-            id: row.id,
-            symbol: row.symbol,
-            rank: row.cmc_rank,
-            price_usd: row.quote.USD.price,
-            change_1hr: row.quote.USD.percent_change_1h,
-            change_24hr: row.quote.USD.percent_change_24h,
-            available_supply: row.circulating_supply,
-            total_supply: row.total_supply
-          };
-        }
+        row = data[row.symbol];
+        coin[row.symbol] = {
+          name: row.name,
+          id: row.id,
+          symbol: row.symbol,
+          rank: row.cmc_rank,
+          price_usd: row.quote.USD.price,
+          change_1hr: row.quote.USD.percent_change_1h,
+          change_24hr: row.quote.USD.percent_change_24h,
+          available_supply: row.circulating_supply,
+          total_supply: row.total_supply
+        };
       
 
         if (coin[symbol].change_1hr > 0) {
