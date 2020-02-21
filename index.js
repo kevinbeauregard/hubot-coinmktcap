@@ -39,11 +39,11 @@ module.exports = function(robot) {
         var data = JSON.parse(body).data;
 
         coin = {};
-        row = data[row.symbol];
-        coin[row.symbol] = {
+        row = data[symbol];
+        coin[symbol] = {
           name: row.name,
           id: row.id,
-          symbol: row.symbol,
+          symbol: symbol,
           rank: row.cmc_rank,
           price_usd: row.quote.USD.price,
           change_1hr: row.quote.USD.percent_change_1h,
