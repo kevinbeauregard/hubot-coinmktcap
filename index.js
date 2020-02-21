@@ -31,110 +31,107 @@ module.exports = function(robot) {
   robot.respond(/(.*) price/i, function(msg) {
     var symbol, url;
     symbol = msg.match[1].toUpperCase();
-    url = "https://api.coinmarketcap.com/v1/ticker/?limit=1500";
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?CMC_PRO_API_KEY=" + apiKey + "&symbol=" + symbol;
     msg.http(url).headers({Accept: "application/json"}).get()(function(err, res, body) {
       var available_supply, change_1hr, change_24hr, coin, color, label, msgBody, row, total_supply, ts, _i, _len;
-      if (res.statusCode !== 200) {
-        msg.send("The CoinMarketCap API did not return a proper response! :rage5:");
 
-      } else {
-
-        res = JSON.parse(body);
-        //console.log(JSON.stringify(res, null, ' '));
+      if (res.statusCode === 200) {
+        var data = JSON.parse(body).data;
 
         coin = {};
-        for (i = 0, len = res.length; i < len; i++) {
-          row = res[i];
+        for (i = 0, len = data.length; i < len; i++) {
+          row = data[i];
           coin[row.symbol] = {
             name: row.name,
             id: row.id,
             symbol: row.symbol,
-            rank: row.rank,
-            price_usd: row.price_usd,
-            change_1hr: row.percent_change_1h,
-            change_24hr: row.percent_change_24h,
-            available_supply: row.available_supply,
+            rank: row.cmc_rank,
+            price_usd: row.quote.USD.price,
+            change_1hr: row.quote.USD.percent_change_1h,
+            change_24hr: row.quote.USD.percent_change_24h,
+            available_supply: row.circulating_supply,
             total_supply: row.total_supply
           };
         }
+      
 
-        if (coin[symbol] === void 0) {
-          msg.send("I am unable to locate a price for that coin. Please verify that it exists on CoinMarketCap.");
+        if (coin[symbol].change_1hr > 0) {
+          color = "#36a64f";
         } else {
-          if (coin[symbol].change_1hr > 0) {
-            color = "#36a64f";
-          } else {
-            color = "#d8000c";
-          }
-          if (!coin[symbol].available_supply) {
-            available_supply = 'Data Unavailable';
-          } else {
-            available_supply = formatCurrency(coin[symbol].available_supply);
-            available_supply = available_supply.replace(/\.00$/, '');
-          }
-          if (!coin[symbol].total_supply) {
-            total_supply = 'Data Unavailable';
-          } else {
-            total_supply = formatCurrency(coin[symbol].total_supply);
-            total_supply = total_supply.replace(/\.00$/, '');
-          }
-          if (coin[symbol].change_1hr === null) {
-            change_1hr = 'Data Unavailable';
-          } else {
-            change_1hr = coin[symbol].change_1hr + '%';
-          }
-          if (coin[symbol].change_24hr === null) {
-            change_24hr = 'Data Unavailable';
-          } else {
-            change_24hr = coin[symbol].change_24hr + '%';
-          }
-
-          ts = Math.floor(new Date() / 1000);
-
-          msgData = {
-            "channel": msg.message.room,
-            "attachments": [
-              {
-                "fallback": "Price Data for " + coin[symbol].name + " from CoinMarketCap",
-                "color": color,
-                "title": coin[symbol].name + " (" + symbol + ")",
-                "title_link": "https://coinmarketcap.com/currencies/" + coin[symbol].id,
-                "fields": [
-                  {
-                    "title": "Price (USD)",
-                    "value": "$" + formatCurrency(coin[symbol].price_usd),
-                    "short": true
-                  }, {
-                    "title": "Market Rank",
-                    "value": formatOrdinal(coin[symbol].rank),
-                    "short": true
-                  }, {
-                    "title": "1hr Change",
-                    "value": change_1hr,
-                    "short": true
-                  }, {
-                    "title": "24hr Change",
-                    "value": change_24hr,
-                    "short": true
-                  }, {
-                    "title": "Available Supply",
-                    "value": available_supply,
-                    "short": true
-                  }, {
-                    "title": "Total Supply",
-                    "value": total_supply,
-                    "short": true
-                  }
-                ],
-                "thumb_url": "https://coincheckup.com/images/coins/" + coin[symbol].id + ".png",
-                "footer": "CoinMarketCap",
-                "footer_icon": "https://raw.githubusercontent.com/jonfairbanks/hubot-formatted-crypto/master/coins.png",
-                "ts": ts
-              }
-            ]
-          }
-          msg.send(msgData);
+          color = "#d8000c";
         }
+        if (!coin[symbol].available_supply) {
+          available_supply = 'Data Unavailable';
+        } else {
+          available_supply = formatCurrency(coin[symbol].available_supply);
+          available_supply = available_supply.replace(/\.00$/, '');
+        }
+        if (!coin[symbol].total_supply) {
+          total_supply = 'Data Unavailable';
+        } else {
+          total_supply = formatCurrency(coin[symbol].total_supply);
+          total_supply = total_supply.replace(/\.00$/, '');
+        }
+        if (coin[symbol].change_1hr === null) {
+          change_1hr = 'Data Unavailable';
+        } else {
+          change_1hr = coin[symbol].change_1hr + '%';
+        }
+        if (coin[symbol].change_24hr === null) {
+          change_24hr = 'Data Unavailable';
+        } else {
+          change_24hr = coin[symbol].change_24hr + '%';
+        }
+
+        ts = Math.floor(new Date() / 1000);
+
+        msgData = {
+          "channel": msg.message.room,
+          "attachments": [
+            {
+              "fallback": "Price Data for " + coin[symbol].name + " from CoinMarketCap",
+              "color": color,
+              "title": coin[symbol].name + " (" + symbol + ")",
+              "title_link": "https://coinmarketcap.com/currencies/" + coin[symbol].id,
+              "fields": [
+                {
+                  "title": "Price (USD)",
+                  "value": "$" + formatCurrency(coin[symbol].price_usd),
+                  "short": true
+                }, {
+                  "title": "Market Rank",
+                  "value": formatOrdinal(coin[symbol].rank),
+                  "short": true
+                }, {
+                  "title": "1hr Change",
+                  "value": change_1hr,
+                  "short": true
+                }, {
+                  "title": "24hr Change",
+                  "value": change_24hr,
+                  "short": true
+                }, {
+                  "title": "Available Supply",
+                  "value": available_supply,
+                  "short": true
+                }, {
+                  "title": "Total Supply",
+                  "value": total_supply,
+                  "short": true
+                }
+              ],
+              "thumb_url": "https://coincheckup.com/images/coins/" + coin[symbol].id + ".png",
+              "footer": "CoinMarketCap",
+              "footer_icon": "https://raw.githubusercontent.com/jonfairbanks/hubot-formatted-crypto/master/coins.png",
+              "ts": ts
+            }
+          ]
+        }
+        msg.send(msgData);
+      } else if (res.statusCode === 400) {
+        msg.send("Could not locate data on CoinMarketCap.");
+      } else {
+        msg.send("CoinMarketCap API may be down");
       }
     });
   });
